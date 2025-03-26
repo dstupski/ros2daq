@@ -3,9 +3,8 @@ import rclpy
 from rclpy.node import Node
 import time
 from std_msgs.msg import Float32MultiArray, Header
-#from magnotether.magnotether import AnalogInputs  # Import the custom message
 from uldaq import get_daq_device_inventory, DaqDevice, InterfaceType, AiInputMode, AInFlag
-#from ros2daq.msg import AnalogInputs
+
 
 class AnalogPublisher(Node):
     def __init__(self):
@@ -32,7 +31,7 @@ class AnalogPublisher(Node):
         if not self.daq_device.is_connected():
             self.get_logger().error("DAQ device not connected.")
             return
-        data =[0.]4
+        data =[0.]*4
         msg = msg = Float32MultiArray()
 
         try:
@@ -48,12 +47,9 @@ class AnalogPublisher(Node):
             #data[6] = self.ai_device.a_in(5, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #data[7] = self.ai_device.a_in(6, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #data[8] = self.ai_device.a_in(7, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
-            #t2 = time.time()
-            print(t2-t1)
-            #msg.header.stamp = self.get_clock().now().to_msg()
+
             msg.data=data
             self.publisher_.publish(msg)
-            #self.get_logger().info(f'Published: {data}')
 
 
         except Exception as e:
