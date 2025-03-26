@@ -32,22 +32,22 @@ class AnalogPublisher(Node):
         if not self.daq_device.is_connected():
             self.get_logger().error("DAQ device not connected.")
             return
-        data =[0.]5
+        data =[0.]4
         msg = msg = Float32MultiArray()
 
         try:
             flags = AInFlag.DEFAULT
-            # Read analog inputs from channels 0 to 7
-            #t1 =time.time()
+            # Read analog inputs from channels 0 to 3, slightly faster and not using other channels
+            #could be moremodular but for now is fine.
             data[0] = (time.time())
             data[1] = self.ai_device.a_in(0, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             data[2] = self.ai_device.a_in(1, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             data[3] = self.ai_device.a_in(2, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #data[4] = self.ai_device.a_in(3, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
-           # data[5] = self.ai_device.a_in(4, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
+            #data[5] = self.ai_device.a_in(4, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #data[6] = self.ai_device.a_in(5, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #data[7] = self.ai_device.a_in(6, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
-           # data[8] = self.ai_device.a_in(7, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
+            #data[8] = self.ai_device.a_in(7, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
             #t2 = time.time()
             print(t2-t1)
             #msg.header.stamp = self.get_clock().now().to_msg()
