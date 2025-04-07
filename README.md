@@ -1,7 +1,7 @@
 # Ros2DAQ
 simple ros2 package for reading analog input data from MCDaq system. N.B. Nidaq drivers don't play nicely with Ubuntu, so I recommend sticking with MCDaq boards.
 
-Tested with USB-202 system
+Tested with MCDaq USB-202 system
 
 ## Example
 
