@@ -8,7 +8,7 @@ Tested with MCDaq USB-202 system
 ### run:
 ```
 
-ros2 run rosdaq daqNode
+ros2 run ros2daq daqNode
 
 ```
 
