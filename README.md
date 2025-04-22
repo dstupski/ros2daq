@@ -34,6 +34,6 @@ should produce:
 /analog_input/AI7
 
 ```
-
+### To do: include analog output functionaliy in same node to get around multiple conneection instances issue
 
 
