@@ -1,55 +1,84 @@
-#!/usr/bin/env python3
+=#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32
-from uldaq import get_daq_device_inventory, DaqDevice, InterfaceType, AiInputMode, AInFlag
+from std_msgs.msg import Float32, Float32MultiArray
+from uldaq import (
+    get_daq_device_inventory, DaqDevice, InterfaceType,
+    AiInputMode, AInFlag, AOutFlag, Range
+)
 
 
-class AnalogPublisher(Node):
+class DAQNode(Node):
     def __init__(self):
-        super().__init__('analog_publisher')
+        super().__init__('daq_node')
 
-        # Initialize DAQ device
+        # === Init DAQ Device ===
         devices = get_daq_device_inventory(InterfaceType.USB)
         if not devices:
             self.get_logger().error("No USB DAQ devices found.")
             return
 
-        self.daq_device = DaqDevice(devices[0])  # Connect to the first available device
-        self.ai_device = self.daq_device.get_ai_device()
+        self.daq_device = DaqDevice(devices[0])
         self.daq_device.connect()
 
-        # Get device range (modify based on your hardware)
+        # === Analog Input Setup ===
+        self.ai_device = self.daq_device.get_ai_device()
         ai_info = self.ai_device.get_info()
         self.ai_range = list(ai_info.get_ranges(AiInputMode.SINGLE_ENDED))[0]
+        self.num_ai_channels = 8
 
-        # Create individual publishers for each analog input
-        self.num_channels = 8  # Adjust as needed
-        self.ai_publishers = []
+        self.ai_publishers = [
+            self.create_publisher(Float32, f'/analog_input/AI{ch}', 10)
+            for ch in range(self.num_ai_channels)
+        ]
 
-        for ch in range(self.num_channels):
-            topic_name = f'/analog_input/AI{ch}'
-            pub = self.create_publisher(Float32, topic_name, 10)
-            self.ai_publishers.append(pub)
+        self.create_timer(0.01, self.read_and_publish_ai)  # 100Hz
 
-        # Publish at 100 Hz
-        self.timer = self.create_timer(0.01, self.publish_analog_data)
+        # === Analog Output Setup ===
+        self.ao_device = self.daq_device.get_ao_device()
+        if self.ao_device:
+            self.ao_range = Range.UNI5VOLTS  # Adjust to match your hardware
+            self.min_voltage = 0.0
+            self.max_voltage = 5.0
 
-    def publish_analog_data(self):
-        if not self.daq_device.is_connected():
-            self.get_logger().error("DAQ device not connected.")
-            return
+            self.create_subscription(
+                Float32MultiArray,
+                '/analog_output/command',
+                self.handle_ao_command,
+                10
+            )
+            self.get_logger().info("Analog output enabled.")
+        else:
+            self.get_logger().warn("No AO device found.")
 
+    def read_and_publish_ai(self):
         flags = AInFlag.DEFAULT
 
-        for ch in range(self.num_channels):
+        for ch in range(self.num_ai_channels):
             try:
                 voltage = self.ai_device.a_in(ch, AiInputMode.SINGLE_ENDED, self.ai_range, flags)
-                msg = Float32()
-                msg.data = voltage
-                self.ai_publishers[ch].publish(msg)
+                self.ai_publishers[ch].publish(Float32(data=voltage))
             except Exception as e:
                 self.get_logger().error(f"Error reading AI{ch}: {e}")
+
+    def handle_ao_command(self, msg: Float32MultiArray):
+        if not self.ao_device:
+            self.get_logger().error("AO device not available.")
+            return
+
+        if len(msg.data) < 2:
+            self.get_logger().warn("AO command needs [channel, voltage].")
+            return
+
+        ch = int(msg.data[0])
+        voltage = float(msg.data[1])
+        voltage = max(self.min_voltage, min(voltage, self.max_voltage))  # Clamp
+
+        try:
+            self.ao_device.a_out(ch, self.ao_range, AOutFlag.DEFAULT, voltage)
+            self.get_logger().info(f"Set AO{ch} to {voltage:.2f} V")
+        except Exception as e:
+            self.get_logger().error(f"Failed to write AO{ch}: {e}")
 
     def destroy_node(self):
         if self.daq_device.is_connected():
@@ -59,7 +88,7 @@ class AnalogPublisher(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = AnalogPublisher()
+    node = DAQNode()
     if node.daq_device.is_connected():
         rclpy.spin(node)
     node.destroy_node()
