@@ -37,7 +37,7 @@ should produce:
 ### Controlling AnalogOut Through ROS2
 To control an analog output channel, you will need to generate a message that contains two pieces of information, the AO channel and the desired voltage as an array
 onto the /analog_output/command topic.  Analog outputs are contained in the same node to avoid multiple scripts attempting to access the daq board simultaneously.
-e.g. to change AO3 to 1.6 volts you would publish a message to /analog_output/command that looks like [3, 1.6] 
+e.g. to change AO3 to 1.6 volts you would publish a float32MultiArray message to /analog_output/command that looks like [3, 1.6], i.e. [channel_number, voltage]
 
 The daqNode will listen for that command and adjust accordingly.  
 
