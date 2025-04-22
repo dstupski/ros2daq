@@ -34,6 +34,11 @@ should produce:
 /analog_input/AI7
 
 ```
-### To do: include analog output functionaliy in same node to get around multiple conneection instances issue
+### Controlling AnalogOut Through ROS2
+To control an analog output channel, you will need to generate a message that contains two pieces of information, the AO channel and the desired voltage as an array
+onto the /analog_output/command topic.
+e.g. to change AO3 to 1.6 volts you would publish a message to /analog_output/command that looks like [3, 1.6]
+
+The daqNode will listen for that command and adjust accordingly
 
 
