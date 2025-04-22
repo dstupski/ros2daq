@@ -39,6 +39,8 @@ To control an analog output channel, you will need to generate a message that co
 onto the /analog_output/command topic.
 e.g. to change AO3 to 1.6 volts you would publish a message to /analog_output/command that looks like [3, 1.6]
 
-The daqNode will listen for that command and adjust accordingly
+The daqNode will listen for that command and adjust accordingly.  
+
+N.B. each mcDaq Board may have a different voltage range profile, I use the one for he MCDAQ usb-202 module.
 
 
