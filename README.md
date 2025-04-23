@@ -42,7 +42,7 @@ e.g. to change AO3 to 1.6 volts you would publish a float32MultiArray message to
 The daqNode will listen for that command and adjust accordingly.  
 
 Included is a simple example of a node that generates a 1hz sine wave from AO0. To test if everything is working you can wire the AO0 channel to the AI0 channel, and check that you see a waveform using plotjuggler.  e.g.
-![screenshot](imageFolder/wine_wave_example.png)
+![Alt text](imageFolder/sine_wave_example.png)
 
 
 N.B. each mcDaq Board may have a different voltage range profile, I use the one for he MCDAQ usb-202 module.
