@@ -21,6 +21,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+        'daqNode = ros2daq.daqNode:main',
         'daqNode = ros2daq.daqNode:main'
         ],
     },
