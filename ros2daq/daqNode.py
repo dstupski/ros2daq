@@ -85,7 +85,7 @@ class DAQNode(Node):
             self.daq_device.disconnect()
         super().destroy_node()
 
-
+#comment test
 def main(args=None):
     rclpy.init(args=args)
     node = DAQNode()
