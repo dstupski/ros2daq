@@ -22,7 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
         'daqNode = ros2daq.daqNode:main',
-        'daqNode = ros2daq.daqNode:main'
+        'analog_out_example = ros2daq.analog_out_example:main'
         ],
     },
 

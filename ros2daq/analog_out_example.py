@@ -20,11 +20,14 @@ class SineWavePublisher(Node):
     def timer_callback(self):
         current_time = time.time() - self.start_time
         frequency = 1.0  # 1 Hz
-        voltage = 1.25 * (1 + np.sin(2 * np.pi * frequency * current_time))  # Range 0 to 2.5V
+        voltage = 2.5* (1 + np.sin(2 * np.pi * frequency * current_time))  # Range 0 to 2.5V
 
         msg = Float32MultiArray()
         msg.data = [float(self.channel), float(voltage)]
+        msg2 = Float32MultiArray()
+        msg2.data = [float(1), foat(2.5)]
         self.publisher_.publish(msg)
+        self.publisher_.publish(msg2)
 
 def main(args=None):
     rclpy.init(args=args)
